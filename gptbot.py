@@ -7,6 +7,9 @@ import telebot
 
 from gptbotenv import *
 
+# print_enable = True
+print_enable = False
+
 bot = telebot.TeleBot(TELEGRAM_API_KEY)
 openai.api_key = OPENAI_API_KEY
 r = sr.Recognizer()
@@ -28,7 +31,8 @@ groups_messages = {
 
 @bot.message_handler(content_types=['voice'])
 def handle_voice(message):
-    print("voice message:", message)
+    if print_enable:
+        print("voice message:", message)
     file_info = bot.get_file(message.voice.file_id)
     downloaded_file = bot.download_file(file_info.file_path)
 
@@ -57,7 +61,8 @@ def handle_text(message):
     if not user_text.startswith("@MihalIvanichBot"):
         return
 
-    # print("text message:", message)
+    if print_enable:
+        print("text message:", message)
     user_text = user_text.replace("@MihalIvanichBot", "", 1).lstrip()
 
     response_text = handle(str(message.chat.id), user_text)
@@ -89,14 +94,15 @@ def send_to_gpt_chat(messages):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo",
         messages=messages,
-        temperature=0.5,
         max_tokens=1024,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0
+        temperature=0.5
+        # top_p=1,
+        # frequency_penalty=0,
+        # presence_penalty=0
     )
-    # print("response chat:", response)
-    # print("response chat text:", response.choices[0].message.content)
+    if print_enable:
+        print("response chat:", response)
+        print("response chat text:", response.choices[0].message.content)
     return response.choices[0].message.content
 
 
@@ -105,7 +111,8 @@ def send_to_gpt_image(message):
         prompt=message,
         size="1024x1024"
     )
-    # print("response image:", response.data[0].url)
+    if print_enable:
+        print("response image:", response.data[0].url)
     return response.data[0].url
 
 
@@ -119,7 +126,8 @@ def recognize_voice(file_oga):
         with user_audio_file as source:
             user_audio = r.record(source)
     text = r.recognize_google(user_audio, language='ru-RU')
-    # print("voice recognized text:", text)
+    if print_enable:
+        print("voice recognized text:", text)
     os.remove(file_wav)
     return text
 
