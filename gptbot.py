@@ -54,6 +54,9 @@ def add_message(chat_id, content):
     messages.append(content)
     messages_length = groups_messages_length.get(chat_id)
     messages_length.append(len(content["content"].split()))
+    if len(messages) % 10 == 0:
+        messages.append(messages[0])
+        messages_length.append(len(messages[0]["content"].split()))
     # Максимум 4096 токенов. 1000 токенов - это примерно 750 слов
     while sum(messages_length) >= 3000 or len(messages) >= 100:
         del messages[1]
@@ -97,7 +100,7 @@ def handle_text(message):
     # if chat_id != DENIS:
     #     return
 
-    if not user_text.startswith("@MihalIvanichBot"):
+    if not user_text.startswith("@MihalIvanichBot") and chat_id != DENIS and chat_id != ULIA:
         add_message(chat_id, {"role": "user", "content": user_text})
         return
 
@@ -158,9 +161,14 @@ def recognize_voice(file_oga):
 
 
 add_message(FAMILY, init_role_family)
+add_message(FAMILY, init_role_family)
+add_message(ULIA, init_role_family)
 add_message(ULIA, init_role_family)
 add_message(GPTD77, init_role_lk_egais)
+add_message(GPTD77, init_role_lk_egais)
 add_message(DENIS, init_role_lk_egais)
+add_message(DENIS, init_role_lk_egais)
+add_message(LK_EGAIS, init_role_lk_egais)
 add_message(LK_EGAIS, init_role_lk_egais)
 
 # Start the bot
