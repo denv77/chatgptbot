@@ -92,7 +92,7 @@ def system_settings(settings_str):
         for name in groups_names:
             all_counts[name] = f'size: {len(groups_messages.get(groups_names.get(name)))} ' \
                                f'words: {sum(groups_messages_length.get(groups_names.get(name)))}'
-        return f'{gpt_chat_settings}\n\n{groups_names}\n\n{all_counts}\n\n{groups_messages}'
+        return f'{gpt_chat_settings}\n\n{groups_names}\n\n{all_counts}\n\n{init_role}'
 
     if msg[1] == "reset" or msg[1] == "hard_reset":
         chat_id = groups_names.get(msg[2])
