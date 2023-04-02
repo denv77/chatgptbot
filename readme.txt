@@ -9,3 +9,5 @@ brew install ffmpeg
 PIP
 pip install pyTelegramBotApi openai
 pip install SpeechRecognition
+pip install pyyaml
+pip install json
