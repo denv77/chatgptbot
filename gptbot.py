@@ -15,6 +15,7 @@ groups_messages = {
     ULIA: [],
     GPTD77: [],
     DENIS: [],
+    SIA: [],
     LK_EGAIS: []
 }
 
@@ -23,11 +24,13 @@ groups_messages_length = {
     ULIA: [],
     GPTD77: [],
     DENIS: [],
+    SIA: [],
     LK_EGAIS: []
 }
 
 groups_names = {
     "FAMILY": FAMILY,
+    "SIA": SIA,
     "ULIA": ULIA,
     "GPTD77": GPTD77,
     "DENIS": DENIS,
@@ -55,6 +58,10 @@ if bot_name == "DV":
     telegram_api_key = TELEGRAM_API_KEY_DV
     telegram_bot_id = "@denv77Bot"
     init_role = init_role_denis
+elif bot_name == "SIA":
+    telegram_api_key = TELEGRAM_API_KEY_SIA
+    telegram_bot_id = "@AmigoSiaBot"
+    init_role = init_role_sia
 elif bot_name == "MI":
     telegram_api_key = TELEGRAM_API_KEY_MI
     telegram_bot_id = "@MihalIvanichBot"
@@ -198,11 +205,11 @@ def handle_text(message):
 
     user_text = message.text.strip()
 
-    if (chat_id == DENIS or chat_id == FAMILY) and user_text.startswith("system"):
+    if (chat_id == DENIS or chat_id == SIA or chat_id == FAMILY) and user_text.startswith("system"):
         bot.reply_to(message, system_settings(user_text))
         return
 
-    if not user_text.startswith(telegram_bot_id) and chat_id != DENIS and chat_id != ULIA:
+    if not user_text.startswith(telegram_bot_id) and chat_id != DENIS and chat_id != SIA and chat_id != ULIA:
         add_message(chat_id, {"role": "user", "content": user_text})
         return
 

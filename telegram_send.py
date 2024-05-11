@@ -2,7 +2,7 @@ import requests
 
 from var.gptbot_env import *
 
-access_token = TELEGRAM_API_KEY_DV
+access_token = TELEGRAM_API_KEY_SIA
 chat_id = GPTD77
 
 
@@ -22,6 +22,7 @@ def send_message(message):
     print("response:", response, response.text)
 
 
+# get_chat_id()
 send_message("initialization...")
 
 # send_message("start mihal\\_ivanich 3.5.0301-beta")

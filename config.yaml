@@ -1,5 +1,5 @@
 app_settings:
-  bot_name: DV
+  bot_name: SIA
   print_enable: true
 gpt_chat_settings:
   frequency_penalty: 0

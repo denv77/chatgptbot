@@ -4,6 +4,9 @@ init_role_family = {'role': 'system',
 init_role_denis = {'role': 'system',
                    'content': 'Ты Денис и ты эксперт в IT сфере'}
 
+init_role_sia = {'role': 'system',
+                 'content': 'Ты Амиго и ты эксперт в области журналистики и цветоводства'}
+
 init_role_lk_egais = {'role': 'system',
                       'content': 'Ты Михал Иваныч и ты сотрудник компании ЦентрИнформ и '
                                  'эксперт в алкогольной продукции и IT сфере'}
