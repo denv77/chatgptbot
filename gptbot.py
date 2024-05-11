@@ -37,7 +37,10 @@ groups_names = {
 print("starting...")
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
+tegram_data_dir = f"{base_dir}/data"
+os.makedirs(tegram_data_dir, exist_ok=True)
 print("base_dir:", base_dir)
+print("tegram_data_dir:", tegram_data_dir)
 print("sys.path[0]:", sys.path[0])
 
 with open(f"{base_dir}/config.yaml", "r") as f:
@@ -172,7 +175,7 @@ def handle_voice(message):
     file_info = bot.get_file(message.voice.file_id)
     downloaded_file = bot.download_file(file_info.file_path)
 
-    file_oga = f"{base_dir}/data/{message.voice.file_unique_id}.oga"
+    file_oga = f"{tegram_data_dir}/{message.voice.file_unique_id}.oga"
     with open(file_oga, "wb") as ogg:
         ogg.write(downloaded_file)
 
@@ -212,7 +215,7 @@ def handle_text(message):
 
 def handle(chat_id, user_text):
     if user_text.lower().startswith("нарисуй"):
-        return send_to_gpt_image(user_text)
+        return send_to_gpt_image(user_text, print_enable)
 
     add_message(chat_id, {"role": "user", "content": user_text})
     response_text = send_to_gpt_chat(get_messages(chat_id), gpt_chat_settings, print_enable)

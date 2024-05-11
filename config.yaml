@@ -1,11 +1,11 @@
 app_settings:
   bot_name: DV
-  print_enable: false
+  print_enable: true
 gpt_chat_settings:
   frequency_penalty: 0
-  max_messages_count: 17
+  max_messages_count: 21
   max_tokens: 1024
-  max_words_count: 2700
+  max_words_count: 1000
   model: gpt-3.5-turbo
   presence_penalty: 0
   temperature: 0.5

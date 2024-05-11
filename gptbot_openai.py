@@ -1,12 +1,15 @@
-import openai
+from openai import OpenAI
 
-from gptbot_env import *
+from var.gptbot_env import *
 
-openai.api_key = OPENAI_API_KEY
+client = OpenAI(
+    api_key=OPENAI_API_KEY,
+    base_url=OPENAI_API_URL
+)
 
 
 def send_to_gpt_chat(messages, settings, debug=False):
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model=settings["model"],
         messages=messages,
         max_tokens=settings["max_tokens"],
@@ -21,8 +24,10 @@ def send_to_gpt_chat(messages, settings, debug=False):
 
 
 def send_to_gpt_image(message, debug=False):
-    response = openai.Image.create(
+    response = client.images.generate(
+        # model="dall-e-3",
         prompt=message,
+        n=1,
         size="1024x1024"
     )
     if debug:

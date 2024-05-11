@@ -1,9 +1,12 @@
+# My
 data/
-.idea/
+var/
 gptbot_env.py
-*.iml
 test.*
 
+# IDEA
+.idea/
+*.iml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

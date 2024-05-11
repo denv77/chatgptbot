@@ -1,8 +1,8 @@
 import requests
 
-from gptbotenv import *
+from var.gptbot_env import *
 
-access_token = TELEGRAM_API_KEY
+access_token = TELEGRAM_API_KEY_DV
 chat_id = GPTD77
 
 
