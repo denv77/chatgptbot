@@ -19,7 +19,6 @@ openai = GptBotOpenAI(var.OPENAI_API_KEY, var.OPENAI_API_URL)
 voice_recognizer = GptBotVoiceRecognizer()
 proxy_api = ProxyApi(var.OPENAI_API_KEY)
 
-
 # Хранит контекст последнего общения группы с ботом
 groups_messages = {
     var.FAMILY: [],
@@ -115,7 +114,7 @@ def print_if(*args: Any):
 
 
 def system_settings(settings_str):
-    print(settings_str)
+    print("system_settings:", settings_str)
 
     msg = settings_str.split(":", 2)
 
@@ -199,6 +198,19 @@ def system_settings(settings_str):
     return info_msg
 
 
+def bot_command(command) -> str:
+    print("bot_command", command)
+
+    if command == "/_command_system":
+        return system_settings("system")
+    elif command == "/_command_system_balance":
+        return system_settings("system:balance")
+    elif command == "/_command_system_info":
+        return system_settings("system:info")
+    else:
+        return "Неизвестная команда"
+
+
 def get_messages(chat_id):
     return groups_messages.get(chat_id)
 
@@ -257,6 +269,9 @@ def handle_text(message):
 
     if (chat_id == var.DENIS or chat_id == var.SIA or chat_id == var.FAMILY) and user_text.startswith("system"):
         bot.reply_to(message, system_settings(user_text))
+        return
+    if (chat_id == var.DENIS or chat_id == var.SIA or chat_id == var.FAMILY) and user_text.startswith("/_command"):
+        bot.reply_to(message, bot_command(user_text))
         return
 
     if not user_text.startswith(
