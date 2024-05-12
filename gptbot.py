@@ -119,7 +119,12 @@ def system_settings(settings_str):
 
     msg = settings_str.split(":", 2)
 
-    info_msg = "system:\nbalance\ninfo\n[reset|hard_reset]:GROUP_NAME\nsettings:{}\nadd:{name,role:[system|user|assistant],content}"
+    info_msg = "system:\n" \
+               "  balance\n" \
+               "  info\n" \
+               "  [reset|hard_reset]:GROUP_NAME\n" \
+               "  [settings_chat|settings_image]:{}\n" \
+               "  add:{name,role:[system|user|assistant],content}"
     if settings_str == "system" or len(msg) < 2:
         return info_msg
 
