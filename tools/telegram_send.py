@@ -1,8 +1,15 @@
+"""
+ Тестовые методы для работы с Telegram ботом
+ В основной программе не используется
+
+ get_chat_id() - если бот недавно куда-то был добавлен
+ send_message(message) - отправить тестовое сообщение
+"""
 import requests
 
 from var.gptbot_env import *
 
-access_token = TELEGRAM_API_KEY_SIA
+access_token = TELEGRAM_API_KEY_DV
 chat_id = GPTD77
 
 

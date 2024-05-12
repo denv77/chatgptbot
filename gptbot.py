@@ -1,77 +1,100 @@
+import argparse
 import json
+import os
 import sys
 import traceback
+from pathlib import Path
 from typing import Any
 
 import telebot
 import yaml
 
-from gptbot_init_roles import *
-from gptbot_openai import *
-from gptbot_voice_recognizer import *
+import var.gptbot_env as var
+from config_init_roles import *
+from gptbot_openai import GptBotOpenAI
+from gptbot_voice_recognizer import GptBotVoiceRecognizer
 
+openai = GptBotOpenAI(var.OPENAI_API_KEY, var.OPENAI_API_URL)
+voice_recognizer = GptBotVoiceRecognizer()
+
+# Хранит контекст последнего общения группы с ботом
 groups_messages = {
-    FAMILY: [],
-    ULIA: [],
-    GPTD77: [],
-    DENIS: [],
-    SIA: [],
-    LK_EGAIS: []
+    var.FAMILY: [],
+    var.ULIA: [],
+    var.GPTD77: [],
+    var.DENIS: [],
+    var.SIA: [],
+    var.LK_EGAIS: []
 }
 
+# Хранит длины сообщений. Нужно для подсчета размера контекста
 groups_messages_length = {
-    FAMILY: [],
-    ULIA: [],
-    GPTD77: [],
-    DENIS: [],
-    SIA: [],
-    LK_EGAIS: []
+    var.FAMILY: [],
+    var.ULIA: [],
+    var.GPTD77: [],
+    var.DENIS: [],
+    var.SIA: [],
+    var.LK_EGAIS: []
 }
 
+# Маппинг названия группы на идентификатор
 groups_names = {
-    "FAMILY": FAMILY,
-    "SIA": SIA,
-    "ULIA": ULIA,
-    "GPTD77": GPTD77,
-    "DENIS": DENIS,
-    "LK_EGAIS": LK_EGAIS
+    "FAMILY": var.FAMILY,
+    "SIA": var.SIA,
+    "ULIA": var.ULIA,
+    "GPTD77": var.GPTD77,
+    "DENIS": var.DENIS,
+    "LK_EGAIS": var.LK_EGAIS
 }
 
 print("starting...")
 
+parser = argparse.ArgumentParser()
+parser.add_argument("-c", "--config", help="path to config file", type=str)
+parsed_args = parser.parse_args()
+print("args:", parsed_args)
+print("args.config:", parsed_args.config)
+
 base_dir = os.path.dirname(os.path.realpath(__file__))
-tegram_data_dir = f"{base_dir}/data"
-os.makedirs(tegram_data_dir, exist_ok=True)
+config_path = f"{base_dir}/config.yaml"
+tegram_data_dir_path = f"{base_dir}/data"
+if parsed_args.config:
+    config_path = Path(parsed_args.config).resolve()
+    tegram_data_dir_path = f"{config_path.parent}/data"
+
 print("base_dir:", base_dir)
-print("tegram_data_dir:", tegram_data_dir)
+print("config_path:", config_path)
+print("tegram_data_dir_path:", tegram_data_dir_path)
 print("sys.path[0]:", sys.path[0])
 
-with open(f"{base_dir}/config.yaml", "r") as f:
+with open(config_path, "r") as f:
     config = yaml.safe_load(f)
+os.makedirs(tegram_data_dir_path, exist_ok=True)
 
 print(f"config: {json.dumps(config, indent=4)}")
 gpt_chat_settings = config["gpt_chat_settings"]
+gpt_image_settings = config["gpt_image_settings"]
 print_enable = config["app_settings"]["print_enable"]
 bot_name = config["app_settings"]["bot_name"]
 
 if bot_name == "DV":
-    telegram_api_key = TELEGRAM_API_KEY_DV
-    telegram_bot_id = "@denv77Bot"
+    telegram_api_key = var.TELEGRAM_API_KEY_DV
+    telegram_bot_id = var.TELEGRAM_BOT_ID_DV
     init_role = init_role_denis
 elif bot_name == "SIA":
-    telegram_api_key = TELEGRAM_API_KEY_SIA
-    telegram_bot_id = "@AmigoSiaBot"
+    telegram_api_key = var.TELEGRAM_API_KEY_SIA
+    telegram_bot_id = var.TELEGRAM_BOT_ID_SIA
     init_role = init_role_sia
 elif bot_name == "MI":
-    telegram_api_key = TELEGRAM_API_KEY_MI
-    telegram_bot_id = "@MihalIvanichBot"
+    telegram_api_key = var.TELEGRAM_API_KEY_MI
+    telegram_bot_id = var.TELEGRAM_BOT_ID_MI
     init_role = init_role_lk_egais
 elif bot_name == "A":
-    telegram_api_key = TELEGRAM_API_KEY_A
-    telegram_bot_id = "@Afanasiy77Bot"
+    telegram_api_key = var.TELEGRAM_API_KEY_A
+    telegram_bot_id = var.TELEGRAM_BOT_ID_A
     init_role = init_role_family
 else:
-    raise Exception(f"bot_name: {bot_name}")
+    raise Exception(f"bot_name not found: {bot_name}")
 
 bot = telebot.TeleBot(telegram_api_key)
 
@@ -85,7 +108,7 @@ def check_auth(chat_id):
 
 def print_if(*args: Any):
     if print_enable:
-        print(*args)
+        print("[DEBUG]", *args)
 
 
 def system_settings(settings_str):
@@ -102,7 +125,7 @@ def system_settings(settings_str):
         for name in groups_names:
             all_counts[name] = f'size: {len(groups_messages.get(groups_names.get(name)))} ' \
                                f'words: {sum(groups_messages_length.get(groups_names.get(name)))}'
-        return f'{gpt_chat_settings}\n\n{groups_names}\n\n{all_counts}\n\n{init_role}'
+        return f'{gpt_chat_settings}\n\n{gpt_image_settings}\n\n{groups_names}\n\n{all_counts}\n\n{init_role}'
 
     if msg[1] == "reset" or msg[1] == "hard_reset":
         chat_id = groups_names.get(msg[2])
@@ -137,15 +160,27 @@ def system_settings(settings_str):
             traceback.print_exc()
             return str(repr(e))
 
-    if msg[1] == "settings":
+    if msg[1] == "settings_chat":
         try:
-            settings = json.loads(msg[2])
-            for k in settings:
-                gpt_chat_settings[k] = settings[k]
+            settings_chat = json.loads(msg[2])
+            for k in settings_chat:
+                gpt_chat_settings[k] = settings_chat[k]
                 config["gpt_chat_settings"] = gpt_chat_settings
-            with open(f"{base_dir}/config.yaml", "w") as cfg_file:
+            with open(config_path, "w") as cfg_file:
                 yaml.dump(config, cfg_file)
             return f'{gpt_chat_settings}'
+        except Exception as e:
+            traceback.print_exc()
+            return str(repr(e))
+    if msg[1] == "settings_image":
+        try:
+            settings_image = json.loads(msg[2])
+            for k in settings_image:
+                gpt_image_settings[k] = settings_image[k]
+                config["gpt_image_settings"] = gpt_image_settings
+            with open(config_path, "w") as cfg_file:
+                yaml.dump(config, cfg_file)
+            return f'{gpt_image_settings}'
         except Exception as e:
             traceback.print_exc()
             return str(repr(e))
@@ -176,17 +211,19 @@ def add_message(chat_id, content):
 def handle_voice(message):
     chat_id = str(message.chat.id)
     if not check_auth(chat_id):
-        return f"Ваш chat_id:{chat_id} не зарегистрирован"
+        err_msg = f"Ваш chat_id:{chat_id} не зарегистрирован"
+        bot.reply_to(message, err_msg)
+        return
 
     print_if("voice message:", message)
     file_info = bot.get_file(message.voice.file_id)
     downloaded_file = bot.download_file(file_info.file_path)
 
-    file_oga = f"{tegram_data_dir}/{message.voice.file_unique_id}.oga"
+    file_oga = f"{tegram_data_dir_path}/{message.voice.file_unique_id}.oga"
     with open(file_oga, "wb") as ogg:
         ogg.write(downloaded_file)
 
-    text = recognize_voice(file_oga)
+    text = voice_recognizer.recognize(file_oga)
     print_if("voice recognized text:", text)
     os.remove(file_oga)
     bot.reply_to(message, text)
@@ -199,17 +236,20 @@ def handle_voice(message):
 def handle_text(message):
     chat_id = str(message.chat.id)
     if not check_auth(chat_id):
-        return f"Ваш chat_id:{chat_id} не зарегистрирован"
+        err_msg = f"Ваш chat_id:{chat_id} не зарегистрирован"
+        bot.reply_to(message, err_msg)
+        return
 
     print_if("text message:", message)
 
     user_text = message.text.strip()
 
-    if (chat_id == DENIS or chat_id == SIA or chat_id == FAMILY) and user_text.startswith("system"):
+    if (chat_id == var.DENIS or chat_id == var.SIA or chat_id == var.FAMILY) and user_text.startswith("system"):
         bot.reply_to(message, system_settings(user_text))
         return
 
-    if not user_text.startswith(telegram_bot_id) and chat_id != DENIS and chat_id != SIA and chat_id != ULIA:
+    if not user_text.startswith(
+            telegram_bot_id) and chat_id != var.DENIS and chat_id != var.SIA and chat_id != var.ULIA:
         add_message(chat_id, {"role": "user", "content": user_text})
         return
 
@@ -221,11 +261,12 @@ def handle_text(message):
 
 
 def handle(chat_id, user_text):
-    if user_text.lower().startswith("нарисуй"):
-        return send_to_gpt_image(user_text, print_enable)
+    if user_text.lower().startswith("нарисуй") and (chat_id == var.DENIS or chat_id == var.SIA):
+        # Вырезаем слово 'нарисуй', перед отправкой
+        return openai.send_to_gpt_image(user_text[7:].lstrip(), gpt_image_settings, print_enable)
 
     add_message(chat_id, {"role": "user", "content": user_text})
-    response_text = send_to_gpt_chat(get_messages(chat_id), gpt_chat_settings, print_enable)
+    response_text = openai.send_to_gpt_chat(get_messages(chat_id), gpt_chat_settings, print_enable)
     print_if("response chat text:", response_text)
     add_message(chat_id, {"role": "assistant", "content": response_text})
     return response_text
