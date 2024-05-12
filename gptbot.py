@@ -270,12 +270,29 @@ def handle_text(message):
     if (chat_id == var.DENIS or chat_id == var.SIA or chat_id == var.FAMILY) and user_text.startswith("system"):
         bot.reply_to(message, system_settings(user_text))
         return
+    if user_text == "/_command_menu":
+        keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+        balance_btn = telebot.types.KeyboardButton("1️⃣ Баланс")
+        system_btn = telebot.types.KeyboardButton("2️⃣ Список системных команд")
+        system_info_btn = telebot.types.KeyboardButton("3️⃣ Системная информация")
+        keyboard.add(balance_btn, system_btn, system_info_btn)
+        bot.reply_to(message, "Меню добавлено!", reply_markup=keyboard)
+        return
+    if user_text == "1️⃣ Баланс":
+        bot.reply_to(message, bot_command("/_command_system_balance"))
+        return
+    if user_text == "2️⃣ Список системных команд":
+        bot.reply_to(message, bot_command("/_command_system"))
+        return
+    if user_text == "3️⃣ Системная информация":
+        bot.reply_to(message, bot_command("/_command_system_info"))
+        return
     if (chat_id == var.DENIS or chat_id == var.SIA or chat_id == var.FAMILY) and user_text.startswith("/_command"):
         bot.reply_to(message, bot_command(user_text))
         return
 
-    if not user_text.startswith(
-            telegram_bot_id) and chat_id != var.DENIS and chat_id != var.SIA and chat_id != var.ULIA:
+    if not user_text.startswith(telegram_bot_id) \
+            and chat_id != var.DENIS and chat_id != var.SIA and chat_id != var.ULIA:
         add_message(chat_id, {"role": "user", "content": user_text})
         return
 
