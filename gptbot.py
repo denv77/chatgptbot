@@ -13,9 +13,12 @@ import var.gptbot_env as var
 from config_init_roles import *
 from gptbot_openai import GptBotOpenAI
 from gptbot_voice_recognizer import GptBotVoiceRecognizer
+from tools.proxy_api import ProxyApi
 
 openai = GptBotOpenAI(var.OPENAI_API_KEY, var.OPENAI_API_URL)
 voice_recognizer = GptBotVoiceRecognizer()
+proxy_api = ProxyApi(var.OPENAI_API_KEY)
+
 
 # Хранит контекст последнего общения группы с ботом
 groups_messages = {
@@ -116,9 +119,12 @@ def system_settings(settings_str):
 
     msg = settings_str.split(":", 2)
 
-    info_msg = "system:\ninfo\n[reset|hard_reset]:GROUP_NAME\nsettings:{}\nadd:{name,role:[system|user|assistant],content}"
+    info_msg = "system:\nbalance\ninfo\n[reset|hard_reset]:GROUP_NAME\nsettings:{}\nadd:{name,role:[system|user|assistant],content}"
     if settings_str == "system" or len(msg) < 2:
         return info_msg
+
+    if msg[1] == "balance":
+        return proxy_api.balance()
 
     if msg[1] == "info":
         all_counts = {}
