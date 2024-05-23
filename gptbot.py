@@ -27,7 +27,8 @@ groups_messages = {
     var.GPTD77: [],
     var.DENIS: [],
     var.SIA: [],
-    var.LK_EGAIS: []
+    var.LK_EGAIS: [],
+    var.TECH: []
 }
 
 # Хранит длины сообщений. Нужно для подсчета размера контекста
@@ -37,7 +38,8 @@ groups_messages_length = {
     var.GPTD77: [],
     var.DENIS: [],
     var.SIA: [],
-    var.LK_EGAIS: []
+    var.LK_EGAIS: [],
+    var.TECH: []
 }
 
 # Маппинг названия группы на идентификатор
@@ -47,7 +49,8 @@ groups_names = {
     "ULIA": var.ULIA,
     "GPTD77": var.GPTD77,
     "DENIS": var.DENIS,
-    "LK_EGAIS": var.LK_EGAIS
+    "LK_EGAIS": var.LK_EGAIS,
+    "TECH": var.TECH
 }
 
 print(f"{datetime.now()} starting...")
