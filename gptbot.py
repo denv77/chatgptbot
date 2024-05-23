@@ -3,6 +3,7 @@ import json
 import os
 import sys
 import traceback
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -49,13 +50,13 @@ groups_names = {
     "LK_EGAIS": var.LK_EGAIS
 }
 
-print("starting...")
+print(f"{datetime.now()} starting...")
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-c", "--config", help="path to config file", type=str)
 parsed_args = parser.parse_args()
-print("args:", parsed_args)
-print("args.config:", parsed_args.config)
+print(f"{datetime.now()} args:", parsed_args)
+print(f"{datetime.now()} args.config:", parsed_args.config)
 
 base_dir = os.path.dirname(os.path.realpath(__file__))
 config_path = f"{base_dir}/config.yaml"
@@ -64,16 +65,16 @@ if parsed_args.config:
     config_path = Path(parsed_args.config).resolve()
     tegram_data_dir_path = f"{config_path.parent}/data"
 
-print("base_dir:", base_dir)
-print("config_path:", config_path)
-print("tegram_data_dir_path:", tegram_data_dir_path)
-print("sys.path[0]:", sys.path[0])
+print(f"{datetime.now()} base_dir:", base_dir)
+print(f"{datetime.now()} config_path:", config_path)
+print(f"{datetime.now()} tegram_data_dir_path:", tegram_data_dir_path)
+print(f"{datetime.now()} sys.path[0]:", sys.path[0])
 
 with open(config_path, "r") as f:
     config = yaml.safe_load(f)
 os.makedirs(tegram_data_dir_path, exist_ok=True)
 
-print(f"config: {json.dumps(config, indent=4)}")
+print(f"{datetime.now()} config: {json.dumps(config, indent=4)}")
 gpt_chat_settings = config["gpt_chat_settings"]
 gpt_image_settings = config["gpt_image_settings"]
 print_enable = config["app_settings"]["print_enable"]
@@ -100,7 +101,7 @@ else:
 
 bot = telebot.TeleBot(telegram_api_key)
 
-print(f"bot: {json.dumps(bot.get_me().to_dict(), indent=4)}")
+print(f"{datetime.now()} bot: {json.dumps(bot.get_me().to_dict(), indent=4)}")
 
 
 def check_auth(chat_id):
@@ -110,11 +111,11 @@ def check_auth(chat_id):
 
 def print_if(*args: Any):
     if print_enable:
-        print("[DEBUG]", *args)
+        print(f"{datetime.now()} [DEBUG]", *args)
 
 
 def system_settings(settings_str):
-    print("system_settings:", settings_str)
+    print(f"{datetime.now()} system_settings:", settings_str)
 
     msg = settings_str.split(":", 2)
 
@@ -199,7 +200,7 @@ def system_settings(settings_str):
 
 
 def bot_command(command) -> str:
-    print("bot_command", command)
+    print(f"{datetime.now()} bot_command", command)
 
     if command == "/_command_system":
         return system_settings("system")
@@ -267,29 +268,38 @@ def handle_text(message):
 
     user_text = message.text.strip()
 
-    if (chat_id == var.DENIS or chat_id == var.SIA or chat_id == var.FAMILY) and user_text.startswith("system"):
-        bot.reply_to(message, system_settings(user_text))
-        return
-    if user_text == "/_command_menu":
-        keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
-        balance_btn = telebot.types.KeyboardButton("1️⃣ Баланс")
-        system_btn = telebot.types.KeyboardButton("2️⃣ Список системных команд")
-        system_info_btn = telebot.types.KeyboardButton("3️⃣ Системная информация")
-        keyboard.add(balance_btn, system_btn, system_info_btn)
-        bot.reply_to(message, "Меню добавлено!", reply_markup=keyboard)
-        return
-    if user_text == "1️⃣ Баланс":
-        bot.reply_to(message, bot_command("/_command_system_balance"))
-        return
-    if user_text == "2️⃣ Список системных команд":
-        bot.reply_to(message, bot_command("/_command_system"))
-        return
-    if user_text == "3️⃣ Системная информация":
-        bot.reply_to(message, bot_command("/_command_system_info"))
-        return
-    if (chat_id == var.DENIS or chat_id == var.SIA or chat_id == var.FAMILY) and user_text.startswith("/_command"):
-        bot.reply_to(message, bot_command(user_text))
-        return
+    if chat_id == var.DENIS or chat_id == var.SIA or chat_id == var.FAMILY:
+        if user_text.startswith("system"):
+            bot.reply_to(message, system_settings(user_text))
+            return
+        if user_text == "/_command_menu":
+            keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+            balance_btn = telebot.types.KeyboardButton("1️⃣ Баланс")
+            system_btn = telebot.types.KeyboardButton("2️⃣ Список системных команд")
+            system_info_btn = telebot.types.KeyboardButton("3️⃣ Системная информация")
+            keyboard.add(balance_btn, system_btn, system_info_btn)
+            bot.reply_to(message, "Меню добавлено!", reply_markup=keyboard)
+            return
+        if user_text == "1️⃣ Баланс":
+            bot.reply_to(message, bot_command("/_command_system_balance"))
+            return
+        if user_text == "2️⃣ Список системных команд":
+            bot.reply_to(message, bot_command("/_command_system"))
+            return
+        if user_text == "3️⃣ Системная информация":
+            bot.reply_to(message, bot_command("/_command_system_info"))
+            return
+        if user_text.startswith("/_command"):
+            bot.reply_to(message, bot_command(user_text))
+            return
+
+    if chat_id == var.LK_EGAIS or chat_id == var.TECH or chat_id == var.GPTD77:
+        if user_text == "☎️ ВКС":
+            bot.reply_to(message, "https://telemost.yandex.ru/j/48927904411584")
+            return
+        if user_text == "⚙️ Настройки":
+            bot.reply_to(message, "Тут пока что нет ничего, но скоро обязательно появится.\nНо это не точно.")
+            return
 
     if not user_text.startswith(telegram_bot_id) \
             and chat_id != var.DENIS and chat_id != var.SIA and chat_id != var.ULIA:
@@ -315,9 +325,20 @@ def handle(chat_id, user_text):
     return response_text
 
 
+def start_mi_bot():
+    keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
+    vks_btn = telebot.types.KeyboardButton("☎️ ВКС")
+    settings_btn = telebot.types.KeyboardButton("⚙️ Настройки")
+    keyboard.add(vks_btn, settings_btn)
+    bot.send_message(var.TECH, "initialization...", reply_markup=keyboard)
+
+
 def main():
     for group in groups_messages:
         add_message(group, init_role)
+
+    if bot_name == "MI":
+        start_mi_bot()
 
     bot.infinity_polling()
 

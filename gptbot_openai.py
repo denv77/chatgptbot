@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from openai import OpenAI
 
 
@@ -20,7 +22,7 @@ class GptBotOpenAI:
             # presence_penalty=0
         )
         if debug:
-            print("[DEBUG] openai chat response:", response)
+            print(f"{datetime.now()} [DEBUG] openai chat response:", response)
         return response.choices[0].message.content
 
     def send_to_gpt_image(self, prompt, settings, debug=False):
@@ -31,5 +33,5 @@ class GptBotOpenAI:
             n=1
         )
         if debug:
-            print("[DEBUG] openai image response:", response)
+            print(f"{datetime.now()} [DEBUG] openai image response:", response)
         return response.data[0].url
