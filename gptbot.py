@@ -27,6 +27,7 @@ groups_messages = {
     var.GPTD77: [],
     var.DENIS: [],
     var.SIA: [],
+    var.SIA_M: [],
     var.LK_EGAIS: [],
     var.TECH: []
 }
@@ -38,6 +39,7 @@ groups_messages_length = {
     var.GPTD77: [],
     var.DENIS: [],
     var.SIA: [],
+    var.SIA_M: [],
     var.LK_EGAIS: [],
     var.TECH: []
 }
@@ -46,6 +48,7 @@ groups_messages_length = {
 groups_names = {
     "FAMILY": var.FAMILY,
     "SIA": var.SIA,
+    "SIA_M": var.SIA_M,
     "ULIA": var.ULIA,
     "GPTD77": var.GPTD77,
     "DENIS": var.DENIS,
@@ -262,12 +265,14 @@ def handle_voice(message):
 @bot.message_handler(content_types=['text'])
 def handle_text(message):
     chat_id = str(message.chat.id)
-    if not check_auth(chat_id):
-        err_msg = f"Ваш chat_id:{chat_id} не зарегистрирован"
-        bot.reply_to(message, err_msg)
-        return
 
     print_if("text message:", message)
+
+    if not check_auth(chat_id):
+        err_msg = f"Ваш chat_id:{chat_id} не зарегистрирован"
+        print_if("WARNING UNREGISTERED:", chat_id)
+        bot.reply_to(message, err_msg)
+        return
 
     user_text = message.text.strip()
 
@@ -305,7 +310,7 @@ def handle_text(message):
             return
 
     if not user_text.startswith(telegram_bot_id) \
-            and chat_id != var.DENIS and chat_id != var.SIA and chat_id != var.ULIA:
+            and chat_id != var.DENIS and chat_id != var.SIA and chat_id != var.ULIA and chat_id != var.SIA_M:
         add_message(chat_id, {"role": "user", "content": user_text})
         return
 
