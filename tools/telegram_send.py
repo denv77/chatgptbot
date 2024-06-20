@@ -25,7 +25,7 @@ def get_chat_id():
 def send_message(message):
     ping_url = 'https://api.telegram.org/bot' + str(access_token) + '/sendMessage?' + \
                'chat_id=' + str(chat_id) + \
-               '&parse_mode=MarkdownV2' + \
+               '&parse_mode=Markdown' + \
                '&text=' + message
     response = requests.get(ping_url)
     print(f"{datetime.now()} response:", response, response.text)

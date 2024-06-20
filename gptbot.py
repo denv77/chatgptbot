@@ -259,7 +259,7 @@ def handle_voice(message):
     bot.reply_to(message, text)
 
     response_text = handle(chat_id, text)
-    bot.reply_to(message, response_text, parse_mode="MarkdownV2")
+    bot.reply_to(message, response_text, parse_mode="Markdown")
 
 
 @bot.message_handler(content_types=['text'])
@@ -278,7 +278,7 @@ def handle_text(message):
 
     if chat_id == var.DENIS or chat_id == var.SIA or chat_id == var.FAMILY:
         if user_text.startswith("system"):
-            bot.reply_to(message, system_settings(user_text), parse_mode="MarkdownV2")
+            bot.reply_to(message, system_settings(user_text), parse_mode="Markdown")
             return
         if user_text == "/_command_menu":
             keyboard = telebot.types.ReplyKeyboardMarkup(resize_keyboard=True)
@@ -289,16 +289,16 @@ def handle_text(message):
             bot.reply_to(message, "Меню добавлено!", reply_markup=keyboard)
             return
         if user_text == "1️⃣ Баланс":
-            bot.reply_to(message, bot_command("/_command_system_balance"), parse_mode="MarkdownV2")
+            bot.reply_to(message, bot_command("/_command_system_balance"), parse_mode="Markdown")
             return
         if user_text == "2️⃣ Список системных команд":
-            bot.reply_to(message, bot_command("/_command_system"), parse_mode="MarkdownV2")
+            bot.reply_to(message, bot_command("/_command_system"), parse_mode="Markdown")
             return
         if user_text == "3️⃣ Системная информация":
-            bot.reply_to(message, bot_command("/_command_system_info"), parse_mode="MarkdownV2")
+            bot.reply_to(message, bot_command("/_command_system_info"), parse_mode="Markdown")
             return
         if user_text.startswith("/_command"):
-            bot.reply_to(message, bot_command(user_text), parse_mode="MarkdownV2")
+            bot.reply_to(message, bot_command(user_text), parse_mode="Markdown")
             return
 
     if chat_id == var.LK_EGAIS or chat_id == var.TECH or chat_id == var.GPTD77:
@@ -318,7 +318,7 @@ def handle_text(message):
 
     response_text = handle(chat_id, user_text)
 
-    bot.reply_to(message, response_text, parse_mode="MarkdownV2")
+    bot.reply_to(message, response_text, parse_mode="Markdown")
 
 
 def handle(chat_id, user_text):
