@@ -345,8 +345,8 @@ def main():
     for group in groups_messages:
         add_message(group, init_role)
 
-    if bot_name == "MI":
-        start_mi_bot()
+#    if bot_name == "MI":
+#        start_mi_bot()
 
     bot.infinity_polling()
 
