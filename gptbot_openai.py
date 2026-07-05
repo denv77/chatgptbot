@@ -15,7 +15,7 @@ class GptBotOpenAI:
         response = self.client.chat.completions.create(
             model=settings["model"],
             messages=messages,
-            max_tokens=settings["max_tokens"],
+#            max_tokens=settings["max_tokens"],
             temperature=settings["temperature"],
             top_p=settings["top_p"]
             # frequency_penalty=0,
