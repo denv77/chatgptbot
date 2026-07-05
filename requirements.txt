@@ -1,0 +1,4 @@
+openai==2.44.0
+pyTelegramBotApi==4.17.0
+SpeechRecognition==3.10.4
+pyyaml
